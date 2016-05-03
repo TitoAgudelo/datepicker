@@ -116,7 +116,7 @@ flatpickr.init = function (element, instanceConfig) {
             self.selectedDateObj = uDate(self.config.defaultDate||self.input.value);
 
 
-        self.jumpToDate();
+        self.jumpToDate();     
 
         wrap();
         buildCalendar();

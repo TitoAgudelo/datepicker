@@ -1,10 +1,29 @@
 <html>
-  <template id="main-template">
-    <style>
-    </style>
-    <main>
-      hola
-    </main>
-  </template>
-  <script src="datepicker.js"></script>
+  	<template id="main-template">
+    	<div class="datepicker-wrapper">
+    		<input class="calendar" placeholder="calendar" data-open>
+    	</div>
+  	</template>
+
+  	<script>
+  		// simulate a component method for datetime-picker
+		var doc = document.currentScript.ownerDocument;
+
+		function createComponent() {
+		  var prototype = Object.create(HTMLElement.prototype);
+
+		  prototype.createdCallback = function() {
+		    var shadow = this.createShadowRoot();
+		    var template = doc.querySelector('#main-template');
+		    shadow.appendChild(template.content.cloneNode(true));
+		  };
+
+		  document.registerElement('datetime-picker', {
+		    prototype
+		  });
+		}
+
+		createComponent();
+  	</script>
+    <script src="datepicker.js"></script>
 </html>
