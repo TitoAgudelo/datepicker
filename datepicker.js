@@ -1,5 +1,5 @@
-/*** 
-  author: Tito Agudelo 
+/***
+  author: Tito Agudelo
   datepicker
  ***/
 'use strict';
@@ -11,7 +11,6 @@ document.onreadystatechange = function(e)
     {
         //dom is ready, window.onload fires later
         document.querySelector("[data-open]").addEventListener( 'click' , self.datetimePicker.init);
-        document.querySelector("[data-open]").addClass += " active";
     }
 };
 
@@ -25,6 +24,8 @@ var currentDate = new Date(),
     calendarContainer = document.querySelector("[data-calendar]"),
     navigation = document.querySelector("[data-nav]"),
     days = document.querySelector("[data-days]"),
+    input = document.querySelector("[data-open]"),
+    wrap = document.querySelector("[date-wrapper]"),
 
     // variables for month navigation
     prevMonthNav = document.createElement('span'),
@@ -42,6 +43,14 @@ var datetimePicker = {
   init() {
     self.datetimePicker.buildNavMonth(self.currentMonth);
     self.datetimePicker.buildDays();
+    self.input.classList.add("active");
+    self.wrap.classList.add("open");
+    self.datetimePicker.binded();
+  },
+
+  binded() {
+    prevMonthNav.addEventListener('click', this.getPreviousMonthAndYear);
+    nextMonthNav.addEventListener('click', this.getNextMonthAndYear);
   },
 
   buildNavMonth(month) {
@@ -52,7 +61,7 @@ var datetimePicker = {
     nextMonthNav.innerHTML = '<i class="icon icon-next"></i>';
 
     currentMonth.className = "datepicker-current-month";
-    currentMonth.innerHTML = this.declare.prototype.data.months.longhand[this.currentMonth];   
+    currentMonth.innerHTML = this.declare.prototype.data.months.longhand[this.currentMonth];
     currentYear.className = "datepicker-current-year";
     currentYear.innerHTML = this.currentYear;
 
@@ -81,9 +90,9 @@ var datetimePicker = {
     self.days.innerHTML = '';
 
     config.minDate =
-      this.uDate(config.minDate === "today" ? new Date() : config.minDate, true);
+      this.date(config.minDate === "today" ? new Date() : config.minDate, true);
 
-    config.maxDate = this.uDate(config.maxDate, true);
+    config.maxDate = this.date(config.maxDate, true);
 
     // prepend days from the ending of previous month
     for( ; dayNumber <= prevMonthDays; dayNumber++ ){
@@ -107,21 +116,31 @@ var datetimePicker = {
 
       className = date_is_disabled ? "disabled datepicker-day" : "slot datepicker-day";
 
-      if (!date_is_disabled && this.equalDates(cur_date, currentDate) )
+      if (!date_is_disabled && this.compareDates(cur_date, currentDate) )
         className += ' today';
 
-      if (!date_is_disabled && this.equalDates(cur_date, self.selectedDateObj) )
+      if (!date_is_disabled && this.compareDates(cur_date, self.selectedDateObj) )
         className += ' selected';
 
       let cell = document.createElement("span");
 
       cell.className = className;
+      cell.addEventListener('click', this.selectedDate);
       cell.innerHTML = (dayNumber > numDays ? dayNumber % numDays : dayNumber);
       self.days.appendChild(cell);
     }
   },
 
-  uDate (date, timeless){
+  selectedDate() {
+      var items = document.getElementsByClassName('slot');
+      for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove('selected');
+      }
+      this.classList.add("selected");
+      self.input.value = self.datetimePicker.currentYear +'-'+ self.datetimePicker.currentMonth +'-'+ this.innerText;
+  },
+
+  date (date, timeless){
     timeless = timeless||false;
 
     if (date === 'today'){
@@ -146,7 +165,7 @@ var datetimePicker = {
     return date;
   },
 
-  equalDates (date1, date2){
+  compareDates (date1, date2){
     if(date1 && date2) {
       return date1.getFullYear() === date2.getFullYear() &&
             date1.getMonth() === date2.getMonth() &&
@@ -166,30 +185,23 @@ var datetimePicker = {
   },
 
   getNextMonthAndYear() {
-    var month = this.currentMonth++;
+    var month = self.datetimePicker.currentMonth++;
     if (month == 13) {
-      year++;
-      month = 1;
+      self.datetimePicker.currentYear++;
+      self.datetimePicker.currentMonth = 1;
     }
 
-    return {
-      year: year,
-      month: month
-    };
+    self.datetimePicker.init();
   },
 
   getPreviousMonthAndYear() {
-    // same as getNextMonthAndYear()
-    var month = this.currentMonth--;
+    var month = self.datetimePicker.currentMonth--;
     if (month == 0) {
-      year--;
-      month = 12;
+      self.datetimePicker.currentYear--;
+      self.datetimePicker.currentMonth = 12;
     }
 
-    return {
-      year: year,
-      month: month
-    };
+    self.datetimePicker.init();
   }
 };
 
